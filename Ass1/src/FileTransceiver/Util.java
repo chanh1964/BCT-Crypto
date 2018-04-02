@@ -1,5 +1,3 @@
-package FileTransceiver;
-
 public class Util {
     /*
     Generate protocol based on code + command
@@ -14,7 +12,7 @@ public class Util {
         return code + Protocol.PROTOCOL_SEPARATOR + command + Protocol.PROTOCOL_SEPARATOR + data;
     }
     static void ParseProtocol(String incomingProtocol, String[] result){
-        System.out.println("FULL: " + incomingProtocol);
+//        System.out.println("FULL: " + incomingProtocol);
         String[] temp = incomingProtocol.split("[__]");
         result[0] = temp[0];
         result[1] = temp[2];

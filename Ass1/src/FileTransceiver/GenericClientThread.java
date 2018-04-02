@@ -8,7 +8,7 @@ public abstract class GenericClientThread extends Thread implements Protocol.Cli
     protected BufferedWriter bf;
     protected BufferedReader br;
     protected String data;
-
+    private Boolean doExitThread = false;
     public GenericClientThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
         try {
@@ -22,37 +22,30 @@ public abstract class GenericClientThread extends Thread implements Protocol.Cli
             e.printStackTrace();
         }
     }
-
+    protected void exitThread() {
+        this.doExitThread = true;
+    }
     @Override
     public void run() {
         DoSomethingBeforeRun();
-        SwitchBasedOnProtocol();
+        while(!this.doExitThread){
+            SwitchBasedOnProtocol();
+        }
     }
 
     protected abstract void DoSomethingBeforeRun();
 
-    protected void SendProtocol(String code,String command){
-//        System.out.println("Inside of send protocol " + code + command);
-        try {
-            bf.append(Util.ProtocolGenerator(code,command));
-            bf.append("\n");
-            bf.flush();
-            System.out.println("sending " + code + command);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-    }
     protected void SendProtocol(String code,String command,String data){
-//        System.out.println("Inside of send protocol " + code + command);
         try {
-            bf.append(Util.ProtocolGenerator(code,command,data));
+            bf.write(Util.ProtocolGenerator(code,command,data));
             bf.append("\n");
             bf.flush();
             System.out.println("sending " + code + command + data);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
     }
 
@@ -83,15 +76,15 @@ public abstract class GenericClientThread extends Thread implements Protocol.Cli
         int read = 0;
         int totalRead = 0;
         int remaining = fileSize;
+        System.out.println(fileSize);
         while((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
             totalRead += read;
             remaining -= read;
             System.out.println("read " + totalRead + " bytes.");
             fos.write(buffer, 0, read);
         }
-
-        fos.close();
-        dis.close();
+//        fos.close();
+//        dis.close();
     }
 
     protected void sendFile(File fileObject) throws IOException {
@@ -103,8 +96,8 @@ public abstract class GenericClientThread extends Thread implements Protocol.Cli
             dos.write(buffer);
         }
 
-        fis.close();
-        dos.close();
+//        fis.close();
+//        dos.close();
     }
 
     private void SwitchBasedOnProtocol(){
@@ -116,13 +109,28 @@ public abstract class GenericClientThread extends Thread implements Protocol.Cli
         switch(codeAndCommand[0]){
             case Protocol.SUCCESS_CODE:
                 switch(codeAndCommand[1]) {
-                    case Protocol.CONNECTION_ESTABLISED_COMMAND:
-//                        System.out.println("200CE");
-                        Handle200CE();
-                        break;
+
                     case Protocol.SEND_FILE_COMMAND:
 //                        System.out.println("200SF");
                         Handle200SF();
+                        break;
+                    case Protocol.SEND_KEY_COMMAND:
+                        System.out.println("200SK");
+                        Handle200SK();
+                        break;
+                    default:
+                        return;
+                }
+                break;
+            case Protocol.OPTION_CODE:
+                switch(codeAndCommand[1]) {
+                    case Protocol.SEND_FILE_COMMAND:
+//                        System.out.println(codeAndCommand.toString());
+                        Handle204SF();
+                        break;
+                    case Protocol.SEND_KEY_COMMAND:
+//                        System.out.println("400SK");
+                        Handle204SK();
                         break;
                     default:
                         return;
@@ -130,13 +138,31 @@ public abstract class GenericClientThread extends Thread implements Protocol.Cli
                 break;
             case Protocol.FAIL_CODE:
                 switch(codeAndCommand[1]) {
-                    case Protocol.CONNECTION_ESTABLISED_COMMAND:
-//                        System.out.println(codeAndCommand.toString());
-                        Handle400CE();
-                        break;
+//                    case Protocol.CONNECTION_ESTABLISED_COMMAND:
+////                        System.out.println(codeAndCommand.toString());
+//                        Handle400CE();
+//                        break;
                     case Protocol.SEND_FILE_COMMAND:
 //                        System.out.println(codeAndCommand.toString());
                         Handle400SF();
+                        break;
+                    case Protocol.SEND_KEY_COMMAND:
+//                        System.out.println("400SK");
+                        Handle400SK();
+                        break;
+                    default:
+                        return;
+                }
+                break;
+            case Protocol.READY_TO_RECEIVE_DATA:
+                switch(codeAndCommand[1]) {
+                    case Protocol.SEND_FILE_COMMAND:
+//                        System.out.println(codeAndCommand.toString());
+                        Handle208SF();
+                        break;
+                    case Protocol.SEND_KEY_COMMAND:
+//                        System.out.println("400SK");
+                        Handle208SK();
                         break;
                     default:
                         return;
