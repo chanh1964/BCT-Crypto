@@ -8,7 +8,7 @@ BCT Crypto is an application built for 'Cryptography & Network Security' course 
 * Triet Tran - 1414169@hcmut.edu.vn
 
 ## University
-Vietnam National University in HCMC 
-Bach Khoa University - BKU 
-(HCMC University of Technology - HCMUT)
+Vietnam National University in HCMC<br>
+Bach Khoa University - BKU<br>
+(HCMC University of Technology - HCMUT)<br>
 Faculty of Computer Science & Engineering
