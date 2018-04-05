@@ -1,8 +1,5 @@
 ## BCT Crypto
-BCT Crypto is an application built for 'Cryptography & Network Security' course assignment. The application has 3 main features:
-* Encrypt/Decrypt a file or folder
-* Generate key
-* Generate/Check HASH string of files
+BCT Crypto is an application built for 'Cryptography & Network Security' course assignment. The application has 3 main features: Encrypt/Decrypt a file or folder, Generate key and Generate/Check HASH string of files
 
 
 ## Authors
