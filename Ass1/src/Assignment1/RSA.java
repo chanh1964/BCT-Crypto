@@ -83,8 +83,8 @@ public class RSA {
 	public void saveKeysToFile(String fileName, String dir) throws IOException{
 		byte[] publicKeyBytes = publicKey.getEncoded();
 		byte[] privateKeyBytes = privateKey.getEncoded();
-		File publicKeyFile = new File(dir+"/fileName.pubk");
-		File privateKeyFile = new File(dir+"/fileName.prik");
+		File publicKeyFile = new File(dir + "\\" + fileName + ".pubk");
+		File privateKeyFile = new File(dir + "\\" + fileName + ".prik");
 		
 		FileOutputStream pubks = new FileOutputStream(publicKeyFile);
 		pubks.write(publicKeyBytes);

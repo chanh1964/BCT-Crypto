@@ -17,6 +17,15 @@ public class GenKey {
 		if(algorithm.equals("DES")){
 			return generate(8);
 		}
+		else if(algorithm.equals("TripleDES")){
+			return generate(24);
+		}
+		else if(algorithm.equals("AES")){
+			return generate(16);
+		}
 		return null;
+	}
+	public boolean Export(String content){
+		return true;
 	}
 }

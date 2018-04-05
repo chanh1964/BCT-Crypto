@@ -2,7 +2,6 @@ package Assignment1;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
 
@@ -16,21 +15,19 @@ public class Md5 {
 			//File file = new File(filePath);
 			FileInputStream fis = new FileInputStream(file);
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			 
-			DigestInputStream dis = new DigestInputStream(fis, md);
+			int nread = 0;
+			byte[] dataBytes = new byte[1024];
+			while((nread = fis.read(dataBytes)) != -1){
+				md.update(dataBytes,0,nread);
+			}
 		    byte[] digest = md.digest();
 		    
 			StringBuffer result = new StringBuffer();
 		    for (byte b : digest) {
-		        result.append(String.format("%02X ", b));
+		        //result.append(String.format("%02X ", b));
+		    	result.append(Integer.toString((b & 0xff)+0x100,16).substring(1));
 		    }
-		    
-		    dis.close();
-		    fis = null;
-		    file = null;
-		    md = null;
-		    dis = null;
-		    digest = null;
+		    fis.close();
 		    return result.toString();
 		    
 		} catch (Exception e) {
