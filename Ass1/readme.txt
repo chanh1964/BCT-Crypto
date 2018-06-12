@@ -35,12 +35,6 @@ That's all for the differences. If you have fill the required inputs for Advance
 
 
 
-*~* ENCRYPT/DECRYPT A TEXT DIRECTLY *~*
-(Text Encryption/Decryption tab)
-You can just input the plain/cipher text and Public/Private Key then click Encrypt/Decrypt
-
-
-
 *~* GENERATE KEY *~*
 (Key Generator tab)
 

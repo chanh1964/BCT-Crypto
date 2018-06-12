@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 //import com.jgoodies.forms.factories.DefaultComponentFactory;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+
 import java.awt.BorderLayout;
 //import javax.swing.JLayeredPane;
 //import java.awt.Window.Type;
@@ -38,12 +40,12 @@ import javax.swing.SwingConstants;
 import javax.swing.JOptionPane;
 //import javax.swing.JMenuBar;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.imageio.ImageIO;
-import javax.print.DocFlavor.URL;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 
@@ -61,10 +63,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Assignment1.*;
 import java.awt.Font;
-import java.awt.Toolkit;
-import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
+import javax.swing.ScrollPaneConstants;
 //import javax.swing.JSplitPane;
 
 public class BCTCryptoGUI{
@@ -97,6 +97,7 @@ public class BCTCryptoGUI{
 	private static final String ZIP_TEMP_DIR=System.getProperty("user.dir")+"\\temp\\";
 	private static final String ZIP_TEMP_FILE = System.getProperty("user.dir")+"\\temp\\temp.zip";
 	private static final BCTCryptoGUI window = new BCTCryptoGUI();
+	private static final RSA _rsa = new RSA();
 	private static final Cryption _crypt = new Cryption(new CallBack(){
 		@Override
 		public void onResultValueOfProgressBar(int value) {
@@ -412,7 +413,7 @@ public class BCTCryptoGUI{
 		frmBctcrypto.setResizable(false);
 		frmBctcrypto.setForeground(SystemColor.window);
 		frmBctcrypto.setBackground(SystemColor.textHighlightText);
-		frmBctcrypto.setTitle("BCT Crypto v1.2");
+		frmBctcrypto.setTitle("BCT Crypto v1.3");
 		frmBctcrypto.setBounds(100, 100, 545, 400);
 		frmBctcrypto.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
 		
@@ -934,6 +935,188 @@ public class BCTCryptoGUI{
 				}
 		});
 		
+		JPanel textPanel = new JPanel();
+		tabbedPane.addTab("Text Encryption/Decryption", null, textPanel, null);
+		tabbedPane.setBackgroundAt(1, Color.WHITE);
+		textPanel.setLayout(null);
+		
+		JTabbedPane tabbedPane_2 = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_2.setBounds(0, 0, 534, 343);
+		textPanel.add(tabbedPane_2);
+		
+		JPanel textPanelEn = new JPanel();
+		tabbedPane_2.addTab("Encryption", null, textPanelEn, null);
+		textPanelEn.setLayout(null);
+		
+		JLabel label_7 = new JLabel("RSA Public Key");
+		label_7.setBounds(10, 11, 92, 20);
+		textPanelEn.add(label_7);
+		
+		TextField txtPub = new TextField();
+		txtPub.setEnabled(false);
+		txtPub.setColumns(10);
+		txtPub.setBounds(120, 11, 299, 20);
+		textPanelEn.add(txtPub);
+		
+		JButton btnBrowseTxtEn = new JButton("Browse");
+		btnBrowseTxtEn.setBounds(425, 11, 94, 20);
+		textPanelEn.add(btnBrowseTxtEn);
+		btnBrowseTxtEn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				jfc.setDialogTitle("Choose RSA Public Key File");
+				jfc.setAcceptAllFileFilterUsed(false);
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("RSA Public Key File (.pubk)","pubk"));
+				if(jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+					txtPub.setText(jfc.getSelectedFile().getAbsolutePath());
+				}
+			}
+			
+		});
+		
+		JLabel label_8 = new JLabel("Plain text");
+		label_8.setBounds(10, 46, 92, 20);
+		textPanelEn.add(label_8);
+		
+		JTextArea txtEnPlain = new JTextArea();
+		txtEnPlain.setWrapStyleWord(true);
+		txtEnPlain.setLineWrap(true);
+		txtEnPlain.setFont(new Font("Times New Roman", Font.PLAIN, 13));
+		//textPanelEn.add(txtEnPlain);
+		JScrollPane scrollEnPlain = new JScrollPane (txtEnPlain, 
+				   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);		
+		scrollEnPlain.setBounds(120, 40, 399, 125);		
+		textPanelEn.add(scrollEnPlain);
+		
+		JTextArea txtEnCipher = new JTextArea();
+		txtEnCipher.setFont(new Font("Times New Roman", Font.PLAIN, 13));
+		txtEnCipher.setEditable(false);
+		txtEnCipher.setLineWrap(true);
+		textPanelEn.add(txtEnCipher);
+		JScrollPane scrollEnCipher = new JScrollPane (txtEnCipher, 
+				   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);		
+		scrollEnCipher.setBounds(120, 171, 399, 134);		
+		textPanelEn.add(scrollEnCipher);
+		
+		JButton btnTxtEn = new JButton("Encrypt");
+		btnTxtEn.setBounds(8, 77, 94, 20);
+		textPanelEn.add(btnTxtEn);
+		btnTxtEn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(txtEnPlain.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Please input plain text!");
+					return;
+				}
+				if(txtPub.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Please specify Public Key");
+					return;
+				}
+				try {
+					txtEnCipher.setText(_rsa.encode64(_rsa.encrypt(txtEnPlain.getText(), txtPub.getText())));
+				} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+						| IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null,"An Error Occurred!");
+				}
+			}
+		});
+		
+		JLabel label_9 = new JLabel("Cipher text");
+		label_9.setBounds(10, 180, 92, 20);
+		textPanelEn.add(label_9);			
+		
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		tabbedPane_2.addTab("Decryption", null, panel, null);
+		
+		JLabel label_10 = new JLabel("RSA Private Key");
+		label_10.setBounds(10, 11, 92, 20);
+		panel.add(label_10);
+		
+		TextField txtPri = new TextField();
+		txtPri.setEnabled(false);
+		txtPri.setColumns(10);
+		txtPri.setBounds(120, 11, 299, 20);
+		panel.add(txtPri);
+		
+		JButton btnBrowseTxtDe = new JButton("Browse");
+		btnBrowseTxtDe.setBounds(425, 11, 94, 20);
+		panel.add(btnBrowseTxtDe);
+		btnBrowseTxtDe.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				jfc.setDialogTitle("Choose RSA Private Key File");
+				jfc.setAcceptAllFileFilterUsed(false);
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("RSA Private Key File (.prik)","prik"));
+				if(jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+					txtPri.setText(jfc.getSelectedFile().getAbsolutePath());
+				}
+			}
+			
+		});
+		
+		JLabel label_11 = new JLabel("Cipher text");
+		label_11.setBounds(10, 46, 92, 20);
+		panel.add(label_11);				
+		
+		JLabel label_12 = new JLabel("Plain text");
+		label_12.setBounds(10, 180, 92, 20);
+		panel.add(label_12);
+		
+		JTextArea txtDeCipher = new JTextArea();
+		txtDeCipher.setFont(new Font("Times New Roman", Font.PLAIN, 13));		
+		txtDeCipher.setLineWrap(true);
+		panel.add(txtDeCipher);
+		JScrollPane scrollDeCipher = new JScrollPane (txtDeCipher, 
+				   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);		
+		scrollDeCipher.setBounds(120, 40, 399, 125);		
+		panel.add(scrollDeCipher);
+		
+		JTextArea txtDePlain = new JTextArea();
+		txtDePlain.setFont(new Font("Times New Roman", Font.PLAIN, 13));
+		txtDePlain.setEditable(false);
+
+		txtDePlain.setLineWrap(true);
+		panel.add(txtDePlain);
+		JScrollPane scrollDePlain = new JScrollPane (txtDePlain, 
+				   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);		
+		scrollDePlain.setBounds(120, 171, 399, 134);	
+		panel.add(scrollDePlain);
+		
+		JButton btnTxtDe = new JButton("Decrypt");
+		btnTxtDe.setBounds(8, 77, 94, 20);
+		panel.add(btnTxtDe);
+		btnTxtDe.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(txtDeCipher.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Please input cipher text!");
+					return;
+				}
+				if(txtPub.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Please specify Private Key");
+					return;
+				}
+				try {
+					txtDePlain.setText(new String(_rsa.decrypt(txtDeCipher.getText(), txtPri.getText())));
+				} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+						| IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null,"An Error Occurred!");
+				}
+			}
+		});
+		
 		JPanel KeyGenPanel = new JPanel();
 		KeyGenPanel.setBackground(new Color(128, 128, 128));
 		tabbedPane.addTab("Key Generator", null, KeyGenPanel, null);
@@ -1203,7 +1386,7 @@ public class BCTCryptoGUI{
 		JLabel label_1 = new JLabel("Name");
 		label_1.setBounds(10, 70, 81, 20);
 		RSAPanel.add(label_1);
-		tabbedPane.setBackgroundAt(1, new Color(255, 255, 255));
+		tabbedPane.setBackgroundAt(2, new Color(255, 255, 255));
 		rsaBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1443,13 +1626,13 @@ public class BCTCryptoGUI{
 			
 		});
 		
-		tabbedPane.setBackgroundAt(2, new Color(255, 255, 255));
+		tabbedPane.setBackgroundAt(3, new Color(255, 255, 255));
 		
 		JPanel About = new JPanel();
 		About.setBackground(SystemColor.menu);
 		tabbedPane.addTab("About", null, About, null);
-		tabbedPane.setBackgroundAt(3, new Color(255, 255, 255));
-		tabbedPane.setEnabledAt(3, true);
+		tabbedPane.setBackgroundAt(4, new Color(255, 255, 255));
+		tabbedPane.setEnabledAt(4, true);
 		About.setLayout(null);
 		try {
 			BufferedImage aboutImg = ImageIO.read(new File(System.getProperty("user.dir")+"/resources/logo.png"));
@@ -1552,7 +1735,7 @@ public class BCTCryptoGUI{
 		});
 		
 		JTextPane txtpnVersion = new JTextPane();
-		txtpnVersion.setText("version 1.2");
+		txtpnVersion.setText("version 1.3");
 		txtpnVersion.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		txtpnVersion.setEditable(false);
 		txtpnVersion.setBackground(SystemColor.menu);

@@ -1,5 +1,6 @@
 package Assignment1;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,6 +19,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.Cipher;
+
+import java.util.Arrays;
 import java.util.Base64;
 
 public class RSA {
@@ -39,20 +42,32 @@ public class RSA {
 		return encrypt(input);
 	}
 	public byte[] encrypt(String input) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{		
-		Cipher cipher;
-		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		return cipher.doFinal(input.getBytes());
+		return encrypt(input.getBytes());
 	}
 	public byte[] encrypt(byte[] input) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{		
 		Cipher cipher;
+		System.out.println("Plain length: "+input.length);
 		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		return cipher.doFinal(input);		
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		int blockCount = input.length/117;
+		if(blockCount==0) return cipher.doFinal(input);
+		int i;
+		for(i = 0; i<=blockCount; ++i){
+			byte[] block = Arrays.copyOfRange(input, 117*i, (i==blockCount)? input.length : 117*(i+1));
+			try {
+				byte[] ahihi = cipher.doFinal(block);
+				output.write(cipher.doFinal(block));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return output.toByteArray();		
 	}
 	public byte[] decrypt(String input, String privateKeyFile) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, IOException{
 		readPrivateKeyFromFile(privateKeyFile);
-		return decrypt(input);
+		return decrypt(decode64(input));
 	}
 	public byte[] decrypt(byte[] input, String privateKeyFile) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, IOException{
 		readPrivateKeyFromFile(privateKeyFile);
@@ -65,7 +80,20 @@ public class RSA {
 		Cipher cipher;
 		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return cipher.doFinal(input);		
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		int blockCount = input.length/128;
+		if(blockCount==0) return cipher.doFinal(input);
+		int i;
+		for(i = 0; i<blockCount; ++i){
+			byte[] block = Arrays.copyOfRange(input, 128*i, 128*(i+1));
+			try {
+				output.write(cipher.doFinal(block));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return output.toByteArray();
 	}
 	public String encode64(byte[] input){
 		return Base64.getEncoder().encodeToString(input);

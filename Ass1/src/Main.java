@@ -16,7 +16,7 @@ import FileTransceiver.*;
 
 public class Main implements CallBack{
     public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, CryptoException {   
-    	testDES();
+    	testRsaEncrypt();
     }
     @Override
 	public void onResultValueOfProgressBar(int value) {
@@ -40,7 +40,7 @@ public class Main implements CallBack{
         Main main= new Main();        
         Cryption crypt = new Cryption(main);
         
-        crypt.encrypt("DES", "EBC", "C:/Users/Chanh KC Tran/Desktop/test/Lab01.key", new File(inputFile), new File(outputFile), "C:\\Users\\Chanh KC Tran\\Desktop\\test\\rsa\\fileName.prik", "ahiahiah");
+        //crypt.encrypt("DES", "EBC", "C:/Users/Chanh KC Tran/Desktop/test/Lab01.key", new File(inputFile), new File(outputFile), "C:\\Users\\Chanh KC Tran\\Desktop\\test\\rsa\\fileName.prik", "ahiahiah");
         //crypt.exportKey(outputFile);
         //crypt.decrypt("DES", "CBC", key, new File(outputFile), new File(decryptedOutput), null, "ahiahiah");
         System.out.println("Done!");
@@ -80,9 +80,13 @@ public class Main implements CallBack{
 	
 	public static void testRsaEncrypt() throws IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidKeySpecException, IOException{
 		RSA rsa = new RSA();
-		byte[] a = rsa.encrypt("Chánh đẹp trai","C:\\Users\\Chanh KC Tran\\Desktop\\test\\rsa\\fileName.prik");
-		//byte[] c = rsa.decrypt("fvVONRnus6wSW6mqT6XDC1JhQiiCOjZjufPSn9mgOF3yskHZKmXFSoNY8bNfFR9TUn1VYAhRLrbXzuKIePurnuIzRZO2qqRAShgCbiUC+Z+LKYpoxOuPuim8+RNsE9Oeu8aefzPXWVv933BGlWTvFnJ/FhH3MCL3E1p/Z/cATiI=","C:\\Users\\Chanh KC Tran\\Desktop\\test\\rsa\\fileName.pubk");
+		byte[] a = rsa.encrypt("Luật An ninh mạng liên tục sử dụng các cụm từ 'thông tin người dùng', 'thông tin cá nhân' mà không định nghĩa rõ các khái niệm này bao gồm những gì dẫn đến nhiều tranh cãi xoay quanhđi","F:\\MM\\Assignment1\\Ass1\\export\\BCT Crypto\\resources\\rsa\\def.pubk");
 		System.out.println(rsa.encode64(a));
+		System.out.println("cipher byte length: "+a.length);
+		byte[] b = rsa.decrypt(rsa.encode64(a), "F:\\MM\\Assignment1\\Ass1\\export\\BCT Crypto\\resources\\rsa\\def.prik");
+		//byte[] c = rsa.decrypt("fvVONRnus6wSW6mqT6XDC1JhQiiCOjZjufPSn9mgOF3yskHZKmXFSoNY8bNfFR9TUn1VYAhRLrbXzuKIePurnuIzRZO2qqRAShgCbiUC+Z+LKYpoxOuPuim8+RNsE9Oeu8aefzPXWVv933BGlWTvFnJ/FhH3MCL3E1p/Z/cATiI=","C:\\Users\\Chanh KC Tran\\Desktop\\test\\rsa\\fileName.pubk");
+		
+		System.out.println(new String(b));
 	}
 	public static void testJson() throws UnsupportedEncodingException{
 		String b = new Md5().generate("C:/Users/Chanh KC Tran/Desktop/test/Lab01.pdf") + ".";
@@ -102,9 +106,5 @@ public class Main implements CallBack{
 			e.printStackTrace();
 		}		
 	}
-	public static void testFileTransceiver(){
-		ServerSocketGenerator serverThread = ServerSocketGenerator.createSocket(27896,"C:\\Users\\Chanh KC Tran\\Desktop\\test\\file");
-		serverThread
-		
-	}
+	
 }
